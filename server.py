@@ -2,7 +2,6 @@
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-import logging
 import os
 
 class GetScript(BaseHTTPRequestHandler):
@@ -21,7 +20,7 @@ class GetScript(BaseHTTPRequestHandler):
 		self.wfile.write(js.encode('utf-8'))
 
 httpd = HTTPServer( ('', 3000), GetScript)
-logging.info('Starting Baller Transpile Server...\n')
+print('Starting Baller Transpile Server on Port 3000...')
 try:
 	httpd.serve_forever()
 except KeyboardInterrupt:
