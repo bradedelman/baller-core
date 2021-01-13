@@ -3,7 +3,7 @@
 
 
 ## Getting Started with Writing Views 
-Now that you've seen the sample running on Android, iOS and Web, lets takea look at the sample View itself and learn how we can edit, transpile and run.
+Now that you've seen the sample running on Android, iOS and Web, let's take a look at the sample View itself and learn how we can edit, transpile and run.
 
 1. Start the Local Transpile Server
 
@@ -16,7 +16,8 @@ Now that you've seen the sample running on Android, iOS and Web, lets takea look
 	
 	when it starts, it will print to the console
 	
-	Starting Baller Transpile Server on Port 3000...	````
+	Starting Baller Transpile Server on Port 3000...	
+	````
 
 2. Let's modify 1 or more sample apps to use the locally served script.  Basically, we just need to update the URL for where to get the script (note the change from https to http as well):
 
