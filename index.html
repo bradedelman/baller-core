@@ -1,0 +1,17 @@
+<!-- Baller Depends on Require -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<!-- Baller -->
+<script src="https://cdn.jsdelivr.net/gh/bradedelman/baller-web@latest/ballerWeb.js"></script>
+
+<!-- Create a Div with an ID for the Baller View -->
+<div id="root1" style="border: solid black; position: absolute; overflow: hidden; width: 400px; height: 840px;">
+</div>
+
+<!-- Use the View Script https://www.cleverfocus.com/baller/index.js -->
+<script>
+requirejs.config({
+    baseUrl: 'https://www.cleverfocus.com/baller/' // tell Require root dir for View Scripts
+});
+BallerView("root1", "index.js", 320); // create Baller With script
+</script>
+
