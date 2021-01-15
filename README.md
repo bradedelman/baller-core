@@ -28,7 +28,7 @@ Now that you've seen the sample running on Android, iOS and Web, let's take a lo
 	
 	````
 	bradedelman@Brad baller-core % bash show_wifi_IP.bash 
-10.0.0.97
+	10.0.0.97
 	````
 	
 	In the examples below, where you see YOUR_IP, use your IP.
