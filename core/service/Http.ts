@@ -93,7 +93,7 @@ export class Http {
         this._info._onSuccess = successCallback;
         this._info._onError = errorCallback;
         var payload = JSON.stringify(this._info);
-        this._context._native.callAPI1("NativeHttp", "send", payload);
+        this._context._native["callAPI1"]("NativeHttp", "send", payload);
     }
 
 }
