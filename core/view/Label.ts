@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class Label extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeLabel", Label);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeLabel", Label, parentId);
     }
 
     text(text: string) {
@@ -12,8 +12,13 @@ export class Label extends View {
         return this;
     }
 
-    font(url: string, size: number) {
-        this.callNative("font", url, size);
+    fontFace(url: string, bSystem: boolean = false) {
+        this.callNative("fontFace", url, bSystem);
+        return this;
+    }
+
+    fontSize(size: number) {
+        this.callNative("fontSize", size);
         return this;
     }
 }

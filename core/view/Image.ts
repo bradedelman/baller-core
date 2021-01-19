@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class Image extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeImage", Image);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeImage", Image, parentId);
     }
 
     url(url: string) {

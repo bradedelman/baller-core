@@ -5,8 +5,8 @@ export class Button extends View {
 
     _handler: Function;
 
-    constructor(context: Context) {
-        super(context, "NativeButton", Button);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeButton", Button, parentId);
     }
 
     text(text: string) {

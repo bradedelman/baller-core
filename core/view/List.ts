@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class List extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeList", List);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeList", List, parentId);
     }
 
     setHorizontal(bHorizontal: boolean)

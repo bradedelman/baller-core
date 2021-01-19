@@ -1,6 +1,6 @@
 import {Context} from "../platform/Context";
 
-type StaticThis<T> = { new (context: any): T };
+type StaticThis<T> = { new (context: any, parentId: string): T };
 
 class LayoutInfo {
     width: number = 0;
@@ -33,14 +33,22 @@ export class View {
     _tags: {};
 
     static New<T extends View>(this: StaticThis<T>, view: View) {
-        const that = new this(view._context);
+        const that = new this(view._context, view._context._currentParent);
         view._context._native["callAPI2"]("NativeHost", "addChild", view._context._currentParent, that._id);
-        that._parentId = view._context._currentParent;
-
         var parent = that._context.__views[that._parentId];
         if (parent) {
             parent._childrenIds.push(that._id);
         }
+        return that;
+    }
+
+    static Create<T extends View>(this: StaticThis<T>, context: Context, parentId: string) {
+        const that = new this(context, parentId);
+        // NOTE: For Create, we don't add to children list or do the native addChild - either top level, or layout is managed by Collection
+        return that;
+    }
+
+    static applyStyle(that: View) {
 
         // process cascadng styles (deepest ancestor first)
         function doStyle(v)
@@ -49,33 +57,25 @@ export class View {
             if (parent) {
                 doStyle(parent);
             }
-            if (v["_style"]) {
-                v["_style"](that._context.__viewTypes[that._viewType], that);
-            }
+            v.style(that._context.__viewTypes[that._viewType], that);
         }
         doStyle(that);
-
-        return that;
     }
 
-    static Create<T extends View>(this: StaticThis<T>, context: Context) {
-        const that = new this(context);
-        return that;
-    }
-
-    constructor(context: Context, type: string, viewType:any) {
+    constructor(context: Context, type: string, viewType:any, parentId: string) {
         this._context = context;
+        this._parentId = parentId;
         this._childrenIds = [];
         this._id = "#" + (this._context._nextViewId++);
         this._context.__views[this._id] = this;
         this._context._native["callAPI2"]("NativeHost", "create", type, this._id);
         this._viewType = this._context.registerViewType(viewType)
+        View.applyStyle(this);
         this.children(this.body.bind(this));
     }
 
-    style(style: Function) {
-        this._style = style;
-        return this;
+    style(viewType: any, view: View)
+    {
     }
 
     body()

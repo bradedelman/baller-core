@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class Div extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeDiv", Div)
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeDiv", Div, parentId)
     }
 
     setBgColor(bgColor: string) {

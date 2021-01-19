@@ -1,5 +1,6 @@
 export {Context} from "./core/platform/Context"; // for bootstrapper
 
+import {View} from "./core/view/View";
 import {Div} from './core/view/Div';
 import {Image} from './core/view/Image';
 import {Label} from './core/view/Label';
@@ -25,11 +26,11 @@ export class MerchantCell extends Div {
                     .tag("icon")
                 Label.New(this)
                     .setBounds(10, 132, 200, 20)
-                    .font("fonts/Roboto-Regular.ttf", 14)
+                    .fontSize(14)
                     .tag("name")
                 Label.New(this)
                     .setBounds(35, 151, 180, 40)
-                    .font("fonts/Roboto-Regular.ttf", 9)
+                    .fontSize(9)
                     .tag("offer")
             })
     }
@@ -58,7 +59,7 @@ export class CategoryCell extends Div {
             .children(()=> {
                 Label.New(this)
                     .setBounds(10, 10, 320, 24)
-                    .font("fonts/Roboto-Regular.ttf", 18)
+                    .fontSize(18)
                     .tag("name")
                 List.New(this)
                     .setHorizontal(true)
@@ -74,6 +75,7 @@ export class CategoryCell extends Div {
         var store = Store.Get(this);
         var name = store.getFromJSON("shop", "categories[$1].name", i);
         var count = store.getArrayCount("shop", "categories[$1].merchants", i);
+
         this.getTag("name").text(name);
         this.getTag("merchantList")["_index"] = i;
         this.getTag("merchantList").setCount(count).ready();
@@ -81,6 +83,14 @@ export class CategoryCell extends Div {
 }
 
 export class MainView extends Div {
+
+    style(viewType: any, view: View) {
+        switch (viewType) {
+            case Label:
+                (view as Label).fontFace("fonts/Roboto-Regular.ttf", true);
+                break;
+        }
+    };
 
     body() {
         Http.Get(this)
@@ -94,7 +104,7 @@ export class MainView extends Div {
             .children(() => {
                 Label.New(this)
                     .text("Shop")
-                    .font("fonts/Roboto-Regular.ttf", 24)
+                    .fontSize(24)
                     .setBounds(10, 10, 320, 30)
                 List.New(this)
                     .setBounds(0, 40, 320, 661)

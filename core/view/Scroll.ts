@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class Scroll extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeScroll", Scroll);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeScroll", Scroll, parentId);
     }
 
     layoutChildren() {

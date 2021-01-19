@@ -19,10 +19,10 @@ export class Context {
         return viewTypeName;
     }
 
-    create(viewTypeId: string):void {
+    create(viewTypeId: string, parentId: string):void {
         this._tags = {};
         let type = this.__viewTypes[viewTypeId];
-        let view = type.Create(this);
+        let view = type.Create(this, parentId);
         view._tags = this._tags;
         this._tags = {};
         return view._id;

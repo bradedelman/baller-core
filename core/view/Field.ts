@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 
 export class Field extends View {
 
-    constructor(context: Context) {
-        super(context, "NativeField", Field);
+    constructor(context: Context, parentId: string) {
+        super(context, "NativeField", Field, parentId);
     }
 
     text(text: string) {
@@ -16,10 +16,16 @@ export class Field extends View {
         return this.callNative("value");
     }
 
-    font(url: string, size: number) {
-        this.callNative("font", url, size);
+    fontFace(url: string, bSystem: boolean = false) {
+        this.callNative("fontFace", url, bSystem);
         return this;
     }
+
+    fontSize(size: number) {
+        this.callNative("fontSize", size);
+        return this;
+    }
+
 }
 
 
