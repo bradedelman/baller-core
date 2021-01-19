@@ -21,6 +21,7 @@ define("core/platform/Context", ["require", "exports"], function (require, expor
             this._nextViewId = 1;
             this.__views = {};
             this.__viewTypes = {};
+            this._tags = {};
             this._native = native;
         }
         Context.prototype.registerViewType = function (viewType) {
@@ -28,9 +29,12 @@ define("core/platform/Context", ["require", "exports"], function (require, expor
             this.__viewTypes[viewTypeName] = viewType;
             return viewTypeName;
         };
-        Context.prototype.create = function (viewTypeId) {
+        Context.prototype.create = function (viewTypeId, parentId) {
+            this._tags = {};
             var type = this.__viewTypes[viewTypeId];
-            var view = type.Create(this);
+            var view = type.Create(this, parentId);
+            view._tags = this._tags;
+            this._tags = {};
             return view._id;
         };
         Context.prototype.call = function (id, method) {
@@ -73,46 +77,72 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
         return LayoutInfo;
     }());
     var View = /** @class */ (function () {
-        function View(context, type, viewType) {
+        function View(context, type, viewType, parentId) {
             this._layout = new LayoutInfo();
             this._context = context;
+            this._parentId = parentId;
             this._childrenIds = [];
             this._id = "#" + (this._context._nextViewId++);
             this._context.__views[this._id] = this;
             this._context._native["callAPI2"]("NativeHost", "create", type, this._id);
             this._viewType = this._context.registerViewType(viewType);
+            View.applyStyle(this);
             this.children(this.body.bind(this));
         }
         View.New = function (view) {
-            var that = new this(view._context);
+            var that = new this(view._context, view._context._currentParent);
             view._context._native["callAPI2"]("NativeHost", "addChild", view._context._currentParent, that._id);
-            that._parentId = view._context._currentParent;
             var parent = that._context.__views[that._parentId];
             if (parent) {
                 parent._childrenIds.push(that._id);
             }
+            return that;
+        };
+        View.Create = function (context, parentId) {
+            var that = new this(context, parentId);
+            // NOTE: For Create, we don't add to children list or do the native addChild - either top level, or layout is managed by Collection
+            return that;
+        };
+        View.applyStyle = function (that) {
             // process cascadng styles (deepest ancestor first)
             function doStyle(v) {
                 var parent = v._context.__views[v._parentId];
                 if (parent) {
                     doStyle(parent);
                 }
-                if (v["_style"]) {
-                    v["_style"](that._context.__viewTypes[that._viewType], that);
-                }
+                v.style(that._context.__viewTypes[that._viewType], that);
             }
             doStyle(that);
-            return that;
         };
-        View.Create = function (context) {
-            var that = new this(context);
-            return that;
-        };
-        View.prototype.style = function (style) {
-            this._style = style;
-            return this;
+        View.prototype.style = function (viewType, view) {
         };
         View.prototype.body = function () {
+        };
+        View.prototype.info = function (info) {
+            this._info = info;
+        };
+        View.prototype.getInfo = function () {
+            if (this._info !== undefined) {
+                return this._info;
+            }
+            var parent = this._context.__views[this._parentId];
+            if (parent) {
+                return parent.getInfo();
+            }
+            return undefined;
+        };
+        View.prototype.tag = function (n) {
+            this._context._tags[n] = this._id;
+            return this;
+        };
+        View.prototype.getTag = function (n) {
+            if (this._tags && this._tags[n]) {
+                return this._context.__views[this._tags[n]];
+            }
+            if (this._parentId) {
+                return this._context.__views[this._parentId].getTag(n);
+            }
+            return null;
         };
         View.prototype.callNative = function (method) {
             var args = [];
@@ -237,15 +267,20 @@ define("core/view/Label", ["require", "exports", "core/view/View"], function (re
     exports.Label = void 0;
     var Label = /** @class */ (function (_super) {
         __extends(Label, _super);
-        function Label(context) {
-            return _super.call(this, context, "NativeLabel", Label) || this;
+        function Label(context, parentId) {
+            return _super.call(this, context, "NativeLabel", Label, parentId) || this;
         }
         Label.prototype.text = function (text) {
             this.callNative("text", text);
             return this;
         };
-        Label.prototype.font = function (url, size) {
-            this.callNative("font", url, size);
+        Label.prototype.fontFace = function (url, bSystem) {
+            if (bSystem === void 0) { bSystem = false; }
+            this.callNative("fontFace", url, bSystem);
+            return this;
+        };
+        Label.prototype.fontSize = function (size) {
+            this.callNative("fontSize", size);
             return this;
         };
         return Label;
@@ -258,8 +293,8 @@ define("core/view/Div", ["require", "exports", "core/view/View"], function (requ
     exports.Div = void 0;
     var Div = /** @class */ (function (_super) {
         __extends(Div, _super);
-        function Div(context) {
-            return _super.call(this, context, "NativeDiv", Div) || this;
+        function Div(context, parentId) {
+            return _super.call(this, context, "NativeDiv", Div, parentId) || this;
         }
         Div.prototype.setBgColor = function (bgColor) {
             this.callNative("setBgColor", bgColor);
@@ -277,8 +312,8 @@ define("core/view/List", ["require", "exports", "core/view/View"], function (req
     exports.List = void 0;
     var List = /** @class */ (function (_super) {
         __extends(List, _super);
-        function List(context) {
-            return _super.call(this, context, "NativeList", List) || this;
+        function List(context, parentId) {
+            return _super.call(this, context, "NativeList", List, parentId) || this;
         }
         List.prototype.setHorizontal = function (bHorizontal) {
             this.callNative("setHorizontal", bHorizontal);
