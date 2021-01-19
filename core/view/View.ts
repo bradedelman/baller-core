@@ -30,6 +30,7 @@ export class View {
     _style: Function;
     _childrenIds: string[];
     _layout: LayoutInfo = new LayoutInfo();
+    _tags: {};
 
     static New<T extends View>(this: StaticThis<T>, view: View) {
         const that = new this(view._context);
@@ -79,6 +80,25 @@ export class View {
 
     body()
     {
+    }
+
+    tag(n: string)
+    {
+        this._context._tags[n] = this._id;
+        return this;
+    }
+
+    getTag(n: string)
+    {
+        if (this._tags && this._tags[n]) {
+            return this._context.__views[this._tags[n]];
+        }
+
+        if (this._parentId) {
+            return this._context.__views[this._parentId].getTag(n);
+        }
+
+        return null;
     }
 
     callNative(method: string, ...args: any[]) {

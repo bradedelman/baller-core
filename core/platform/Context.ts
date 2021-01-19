@@ -7,6 +7,7 @@ export class Context {
     __views = {};
     __viewTypes = {};
     _currentParent: string; // if it starts with # then it's an integer View id after that (enables easier UI build pattern)
+    _tags = {};
 
     constructor(native: Object) {
         this._native = native;
@@ -19,8 +20,11 @@ export class Context {
     }
 
     create(viewTypeId: string):void {
+        this._tags = {};
         let type = this.__viewTypes[viewTypeId];
         let view = type.Create(this);
+        view._tags = this._tags;
+        this._tags = {};
         return view._id;
     }
 

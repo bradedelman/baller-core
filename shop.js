@@ -21,6 +21,7 @@ define("core/platform/Context", ["require", "exports"], function (require, expor
             this._nextViewId = 1;
             this.__views = {};
             this.__viewTypes = {};
+            this._tags = {};
             this._native = native;
         }
         Context.prototype.registerViewType = function (viewType) {
@@ -29,8 +30,11 @@ define("core/platform/Context", ["require", "exports"], function (require, expor
             return viewTypeName;
         };
         Context.prototype.create = function (viewTypeId) {
+            this._tags = {};
             var type = this.__viewTypes[viewTypeId];
             var view = type.Create(this);
+            view._tags = this._tags;
+            this._tags = {};
             return view._id;
         };
         Context.prototype.call = function (id, method) {
@@ -113,6 +117,19 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
             return this;
         };
         View.prototype.body = function () {
+        };
+        View.prototype.tag = function (n) {
+            this._context._tags[n] = this._id;
+            return this;
+        };
+        View.prototype.getTag = function (n) {
+            if (this._tags && this._tags[n]) {
+                return this._context.__views[this._tags[n]];
+            }
+            if (this._parentId) {
+                return this._context.__views[this._parentId].getTag(n);
+            }
+            return null;
         };
         View.prototype.callNative = function (method) {
             var args = [];
@@ -230,50 +247,6 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
         return View;
     }());
     exports.View = View;
-});
-define("core/service/Store", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Store = void 0;
-    var Store = /** @class */ (function () {
-        function Store() {
-        }
-        Store.Get = function (view) {
-            var that = new Store();
-            that._context = view._context;
-            return that;
-        };
-        Store.prototype.set = function (key, value) {
-            this._context._native.callAPI2("NativeStore", "set", key, JSON.stringify(value));
-        };
-        Store.prototype.get = function (key) {
-            return JSON.parse(this._context._native.callAPI1("NativeStore", "get", key));
-        };
-        Store.prototype.getArrayCount = function (key, path) {
-            var args = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                args[_i - 2] = arguments[_i];
-            }
-            var payload = {
-                _path: path,
-                _args: args
-            };
-            return this._context._native.callAPI2("NativeStore", "getArrayCount", key, JSON.stringify(payload));
-        };
-        Store.prototype.getFromJSON = function (key, path) {
-            var args = [];
-            for (var _i = 2; _i < arguments.length; _i++) {
-                args[_i - 2] = arguments[_i];
-            }
-            var payload = {
-                _path: path,
-                _args: args
-            };
-            return JSON.parse(this._context._native.callAPI2("NativeStore", "getFromJSON", key, JSON.stringify(payload)));
-        };
-        return Store;
-    }());
-    exports.Store = Store;
 });
 define("core/view/Div", ["require", "exports", "core/view/View"], function (require, exports, View_1) {
     "use strict";
@@ -441,14 +414,58 @@ define("core/service/Http", ["require", "exports"], function (require, exports) 
             this._info._onSuccess = successCallback;
             this._info._onError = errorCallback;
             var payload = JSON.stringify(this._info);
-            this._context._native.callAPI1("NativeHttp", "send", payload);
+            this._context._native["callAPI1"]("NativeHttp", "send", payload);
         };
         Http._nextRequestId = 1;
         return Http;
     }());
     exports.Http = Http;
 });
-define("shop", ["require", "exports", "core/service/Store", "core/platform/Context", "core/view/Div", "core/view/Image", "core/view/Label", "core/view/List", "core/service/Http"], function (require, exports, Store_1, Context_1, Div_1, Image_1, Label_1, List_1, Http_1) {
+define("core/service/Store", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Store = void 0;
+    var Store = /** @class */ (function () {
+        function Store() {
+        }
+        Store.Get = function (view) {
+            var that = new Store();
+            that._context = view._context;
+            return that;
+        };
+        Store.prototype.set = function (key, value) {
+            this._context._native["callAPI2"]("NativeStore", "set", key, JSON.stringify(value));
+        };
+        Store.prototype.get = function (key) {
+            return JSON.parse(this._context._native["callAPI1"]("NativeStore", "get", key));
+        };
+        Store.prototype.getArrayCount = function (key, path) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
+            var payload = {
+                _path: path,
+                _args: args
+            };
+            return this._context._native["callAPI2"]("NativeStore", "getArrayCount", key, JSON.stringify(payload));
+        };
+        Store.prototype.getFromJSON = function (key, path) {
+            var args = [];
+            for (var _i = 2; _i < arguments.length; _i++) {
+                args[_i - 2] = arguments[_i];
+            }
+            var payload = {
+                _path: path,
+                _args: args
+            };
+            return JSON.parse(this._context._native["callAPI2"]("NativeStore", "getFromJSON", key, JSON.stringify(payload)));
+        };
+        return Store;
+    }());
+    exports.Store = Store;
+});
+define("shop", ["require", "exports", "core/platform/Context", "core/view/Div", "core/view/Image", "core/view/Label", "core/view/List", "core/service/Http", "core/service/Store"], function (require, exports, Context_1, Div_1, Image_1, Label_1, List_1, Http_1, Store_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MainView = exports.CategoryCell = exports.MerchantCell = exports.Context = void 0;
@@ -464,19 +481,23 @@ define("shop", ["require", "exports", "core/service/Store", "core/platform/Conte
                 .setBgColor("#ffffff")
                 .setBounds(0, 0, 220, 200)
                 .children(function () {
-                _this.image = Image_1.Image.New(_this)
-                    .setBounds(10, 10, 200, 120);
+                Image_1.Image.New(_this)
+                    .setBounds(10, 10, 200, 120)
+                    .tag("image");
                 Image_1.Image.New(_this)
                     .url("https://www.cleverfocus.com/baller/tag.png")
                     .setBounds(10, 150, 20, 20);
-                _this.icon = Image_1.Image.New(_this)
-                    .setBounds(20, 100, 20, 20);
-                _this.name = Label_1.Label.New(_this)
+                Image_1.Image.New(_this)
+                    .setBounds(20, 100, 20, 20)
+                    .tag("icon");
+                Label_1.Label.New(_this)
                     .setBounds(10, 132, 200, 20)
-                    .font("fonts/Roboto-Regular.ttf", 14);
-                _this.offer = Label_1.Label.New(_this)
+                    .font("fonts/Roboto-Regular.ttf", 14)
+                    .tag("name");
+                Label_1.Label.New(_this)
                     .setBounds(35, 151, 180, 40)
-                    .font("fonts/Roboto-Regular.ttf", 9);
+                    .font("fonts/Roboto-Regular.ttf", 9)
+                    .tag("offer");
             });
         };
         MerchantCell.prototype.onPopulate = function (i, parentId) {
@@ -484,10 +505,10 @@ define("shop", ["require", "exports", "core/service/Store", "core/platform/Conte
             var index = parent["_index"];
             var store = Store_1.Store.Get(this);
             var merchant = store.getFromJSON("shop", "categories[$1].merchants[$2]", index, i);
-            this.image.url(merchant.image + "?width=220");
-            this.icon.url(merchant.icon + "?width=40");
-            this.name.text(merchant.name);
-            this.offer.text(merchant.offer);
+            this.getTag("image").url(merchant.image + "?width=220");
+            this.getTag("icon").url(merchant.icon + "?width=40");
+            this.getTag("name").text(merchant.name);
+            this.getTag("offer").text(merchant.offer);
         };
         return MerchantCell;
     }(Div_1.Div));
@@ -503,23 +524,25 @@ define("shop", ["require", "exports", "core/service/Store", "core/platform/Conte
                 .setBgColor("#ffffff")
                 .setBounds(0, 0, 320, 230)
                 .children(function () {
-                _this._name = Label_1.Label.New(_this)
+                Label_1.Label.New(_this)
                     .setBounds(10, 10, 320, 24)
-                    .font("fonts/Roboto-Regular.ttf", 18);
-                _this._merchantList = List_1.List.New(_this)
+                    .font("fonts/Roboto-Regular.ttf", 18)
+                    .tag("name");
+                List_1.List.New(_this)
                     .setHorizontal(true)
                     .setBounds(0, 34, 320, 200)
                     .setViewSize(220, 200)
-                    .setViewType(MerchantCell);
+                    .setViewType(MerchantCell)
+                    .tag("merchantList");
             });
         };
         CategoryCell.prototype.onPopulate = function (i) {
             var store = Store_1.Store.Get(this);
             var name = store.getFromJSON("shop", "categories[$1].name", i);
             var count = store.getArrayCount("shop", "categories[$1].merchants", i);
-            this._name.text(name);
-            this._merchantList["_index"] = i;
-            this._merchantList.setCount(count).ready();
+            this.getTag("name").text(name);
+            this.getTag("merchantList")["_index"] = i;
+            this.getTag("merchantList").setCount(count).ready();
         };
         return CategoryCell;
     }(Div_1.Div));
@@ -543,16 +566,17 @@ define("shop", ["require", "exports", "core/service/Store", "core/platform/Conte
                     .text("Shop")
                     .font("fonts/Roboto-Regular.ttf", 24)
                     .setBounds(10, 10, 320, 30);
-                _this._categoryList = List_1.List.New(_this)
+                List_1.List.New(_this)
                     .setBounds(0, 40, 320, 661)
                     .setViewSize(320, 244)
-                    .setViewType(CategoryCell);
+                    .setViewType(CategoryCell)
+                    .tag("categoryList");
             });
         };
         MainView.prototype.onData = function () {
             var store = Store_1.Store.Get(this);
             var count = store.getArrayCount("shop", "categories");
-            this._categoryList.setCount(count).ready();
+            this.getTag("categoryList").setCount(count).ready();
         };
         return MainView;
     }(Div_1.Div));
