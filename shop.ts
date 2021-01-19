@@ -37,8 +37,7 @@ export class MerchantCell extends Div {
 
     onPopulate(i: number, parentId: string) {
 
-        var parent = this._context.__views[parentId];
-        var index = parent["_index"];
+        var index = this.getInfo();
         var store = Store.Get(this);
         var merchant = store.getFromJSON("shop", "categories[$1].merchants[$2]", index, i);
 
@@ -77,7 +76,7 @@ export class CategoryCell extends Div {
         var count = store.getArrayCount("shop", "categories[$1].merchants", i);
 
         this.getTag("name").text(name);
-        this.getTag("merchantList")["_index"] = i;
+        this.getTag("merchantList").info(i);
         this.getTag("merchantList").setCount(count).ready();
     }
 }

@@ -31,6 +31,7 @@ export class View {
     _childrenIds: string[];
     _layout: LayoutInfo = new LayoutInfo();
     _tags: {};
+    _info: any;
 
     static New<T extends View>(this: StaticThis<T>, view: View) {
         const that = new this(view._context, view._context._currentParent);
@@ -80,6 +81,25 @@ export class View {
 
     body()
     {
+    }
+
+    info(info: any)
+    {
+        this._info = info;
+    }
+
+    getInfo()
+    {
+        if (this._info !== undefined) {
+            return this._info;
+        }
+
+        var parent =  this._context.__views[this._parentId];
+        if (parent) {
+            return parent.getInfo();
+        }
+
+        return undefined;
     }
 
     tag(n: string)

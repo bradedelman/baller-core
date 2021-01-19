@@ -118,6 +118,19 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
         };
         View.prototype.body = function () {
         };
+        View.prototype.info = function (info) {
+            this._info = info;
+        };
+        View.prototype.getInfo = function () {
+            if (this._info !== undefined) {
+                return this._info;
+            }
+            var parent = this._context.__views[this._parentId];
+            if (parent) {
+                return parent.getInfo();
+            }
+            return undefined;
+        };
         View.prototype.tag = function (n) {
             this._context._tags[n] = this._id;
             return this;
@@ -506,8 +519,7 @@ define("shop", ["require", "exports", "core/platform/Context", "core/view/Div", 
             });
         };
         MerchantCell.prototype.onPopulate = function (i, parentId) {
-            var parent = this._context.__views[parentId];
-            var index = parent["_index"];
+            var index = this.getInfo();
             var store = Store_1.Store.Get(this);
             var merchant = store.getFromJSON("shop", "categories[$1].merchants[$2]", index, i);
             this.getTag("image").url(merchant.image + "?width=220");
@@ -546,7 +558,7 @@ define("shop", ["require", "exports", "core/platform/Context", "core/view/Div", 
             var name = store.getFromJSON("shop", "categories[$1].name", i);
             var count = store.getArrayCount("shop", "categories[$1].merchants", i);
             this.getTag("name").text(name);
-            this.getTag("merchantList")["_index"] = i;
+            this.getTag("merchantList").info(i);
             this.getTag("merchantList").setCount(count).ready();
         };
         return CategoryCell;
