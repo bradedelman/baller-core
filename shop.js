@@ -580,7 +580,7 @@ define("shop", ["require", "exports", "core/platform/Context", "core/view/Div", 
         MainView.prototype.body = function () {
             var _this = this;
             Http_1.Http.Get(this)
-                .url("https://www.cleverfocus.com/baller/shop.json")
+                .url("https://s3.amazonaws.com/www.cleverfocus.com/baller/shop.json")
                 .storeId("shop")
                 .send(this.onData, null);
             Div_1.Div.New(this)

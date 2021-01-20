@@ -93,7 +93,7 @@ export class MainView extends Div {
 
     body() {
         Http.Get(this)
-            .url("https://www.cleverfocus.com/baller/shop.json")
+            .url("https://s3.amazonaws.com/www.cleverfocus.com/baller/shop.json")
             .storeId("shop")
             .send(this.onData, null);
 
