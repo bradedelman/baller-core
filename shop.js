@@ -245,6 +245,13 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
                         child._layout.y += child._layout.top;
                     }
                 }
+                // see if width or height is "fill"
+                if (child._layout.width === "fill") {
+                    child._layout.width = this._layout.width - child._layout.x;
+                }
+                if (child._layout.height === "fill") {
+                    child._layout.height = this._layout.height - child._layout.y;
+                }
             }
         };
         View.prototype.layoutChildrenOuter = function () {
@@ -585,14 +592,14 @@ define("shop", ["require", "exports", "core/platform/Context", "core/view/Div", 
                 .send(this.onData, null);
             Div_1.Div.New(this)
                 .setBgColor("#ffffff")
-                .setBounds(0, 0, 320, 800)
+                .setBounds(0, 0, 320, "fill")
                 .children(function () {
                 Label_1.Label.New(_this)
                     .text("Shop")
                     .fontSize(24)
                     .setBounds(10, 10, 320, 30);
                 List_1.List.New(_this)
-                    .setBounds(0, 40, 320, 661)
+                    .setBounds(0, 40, 320, "fill")
                     .setViewSize(320, 244)
                     .setViewType(CategoryCell)
                     .tag("categoryList");

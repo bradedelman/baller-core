@@ -3,8 +3,8 @@ import {Context} from "../platform/Context";
 type StaticThis<T> = { new (context: any, parentId: string): T };
 
 class LayoutInfo {
-    width: number = 0;
-    height: number = 0;
+    width: any = 0;
+    height: any = 0;
 
     // use only 1 of these 3
     left: number = 0;
@@ -133,7 +133,7 @@ export class View {
         }
     }
 
-    setBounds(x: number, y: number, w: number, h:number) {
+    setBounds(x: number, y: number, w: any, h:any) {
         this.size(w, h);
         this.position({left: x, top: y});
         this.callNative("setBounds", x, y, w, h); // TODO: figure out why Web List View assumes this
@@ -218,6 +218,14 @@ export class View {
                 if (child._layout.top !== undefined) {
                     child._layout.y += child._layout.top;
                 }
+            }
+
+            // see if width or height is "fill"
+            if (child._layout.width === "fill") {
+                child._layout.width = this._layout.width - child._layout.x;
+            }
+            if (child._layout.height === "fill") {
+                child._layout.height = this._layout.height - child._layout.y;
             }
         }
     }

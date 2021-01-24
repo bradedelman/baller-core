@@ -99,14 +99,14 @@ export class MainView extends Div {
 
         Div.New(this)
             .setBgColor("#ffffff")
-            .setBounds(0, 0, 320, 800)
+            .setBounds(0, 0, 320, "fill")
             .children(() => {
                 Label.New(this)
                     .text("Shop")
                     .fontSize(24)
                     .setBounds(10, 10, 320, 30)
                 List.New(this)
-                    .setBounds(0, 40, 320, 661)
+                    .setBounds(0, 40, 320, "fill")
                     .setViewSize(320, 244)
                     .setViewType(CategoryCell)
                     .tag("categoryList")
