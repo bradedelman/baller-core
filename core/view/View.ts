@@ -136,7 +136,6 @@ export class View {
     setBounds(x: number, y: number, w: any, h:any) {
         this.size(w, h);
         this.position({left: x, top: y});
-        this.callNative("setBounds", x, y, w, h); // TODO: figure out why Web List View assumes this
         return this;
     }
 

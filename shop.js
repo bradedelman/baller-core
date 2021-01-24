@@ -162,7 +162,6 @@ define("core/view/View", ["require", "exports"], function (require, exports) {
         View.prototype.setBounds = function (x, y, w, h) {
             this.size(w, h);
             this.position({ left: x, top: y });
-            this.callNative("setBounds", x, y, w, h); // TODO: figure out why Web List View assumes this
             return this;
         };
         View.prototype.size = function (width, height) {
