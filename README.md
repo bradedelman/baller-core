@@ -1,6 +1,13 @@
-# Baller Views (Alpha 0.1)
+# Baller Views (Alpha 0.0.3)
 
 
+## Getting Started Guides for the 3 Baller Platforms:
+
+Android: [https://github.com/bradedelman/baller-android](https://github.com/bradedelman/baller-android)
+
+iOS: [https://github.com/bradedelman/baller-ios](https://github.com/bradedelman/baller-ios)
+
+Web: [https://github.com/bradedelman/baller-web](https://github.com/bradedelman/baller-web)
 
 ## Getting Started with Writing Views 
 Now that you've seen the sample running on Android, iOS and Web, let's take a look at the sample View itself and learn how we can edit, transpile and run.
