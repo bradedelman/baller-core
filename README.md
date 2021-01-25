@@ -1,4 +1,4 @@
-# Baller Views (Alpha 0.0.3)
+# Baller Views (Alpha 0.0.4)
 
 
 ## Getting Started Guides for the 3 Baller Platforms:
