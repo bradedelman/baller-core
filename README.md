@@ -60,18 +60,18 @@ Now that you've seen the sample running on Android, iOS and Web, let's take a lo
 	Android
 	
 	in MainActivity, change:
-   val contents = URL("https://www.cleverfocus.com/baller/sample.js").readText()
-   to
-   val contents = URL("http://YOUR_IP:3000/sample.js").readText()
+	ballerView.loadUrl("https://www.cleverfocus.com/baller/sample.js")
+	to
+	ballerView.loadUrl("http://YOUR_IP:3000/sample.js")
 	````   
 
 	````
 	iOS
 
 	in ViewController, change:
-   if let url = URL(string: "https://www.cleverfocus.com/baller/sample.js") {
+   ballerView.loadUrl(urlString: "https://www.cleverfocus.com/baller/sample.js")
 	to
-   if let url = URL(string: "http://YOUR_IP:3000/sample.js") {
+   ballerView.loadUrl(urlString: "http://YOUR_IP:3000/sample.js")
 	````
 	
 	````
